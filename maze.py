@@ -510,9 +510,10 @@ if __name__ == "__main__":
 
         # Save images to disk
         img_format = args.output.split(".")[-1]
-        base_path = args.output[:-len(img_format)]
-        maze.save(base_path+".solution."+args.output.split(".")[-1])
-        solved_maze.save(args.output)
+        base_path = args.output[:-len(img_format)-1]
+        maze.save(args.output)
+        solved_maze.save(base_path+".solution."+img_format)
+        
 
         end_rendering_time = time.process_time()
 
@@ -527,7 +528,7 @@ if __name__ == "__main__":
     # Generate animation
     if args.video is not None and args.output != "":
         img_format = args.output.split(".")[-1]
-        base_path = args.output[:-len(img_format)]
+        base_path = args.output[:-len(img_format)-1]
         tmp_name = f"{base_path}.tmp.mp4"
         video_name = f"{base_path}.mp4"
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
