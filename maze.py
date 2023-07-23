@@ -549,12 +549,12 @@ if __name__ == "__main__":
         end_animation_time = time.process_time()
     
     # Timeit render
-        if args.timeit:
-            print(f"Generation took: {end_build_time - start_build_time} s")
-            print(f"Solving took: {end_solve_time - start_solve_time} s")
-            if args.output != "":
-                print(f"Images took: {end_rendering_time - start_rendering_time} s")
-            if args.video is not None and args.output != "":
-                print(f"Video took: {end_animation_time - start_animation_time} s")
+    if args.timeit:
+        print(f"Generation took: {end_build_time - start_build_time} s")
+        print(f"Solving took: {end_solve_time - start_solve_time} s")
+        if args.output != "":
+            print(f"Images took: {end_rendering_time - start_rendering_time} s")
+        if args.video is not None and args.output != "":
+            print(f"Video took: {end_animation_time - start_animation_time} s")
 
 
