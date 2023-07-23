@@ -453,7 +453,7 @@ if __name__ == "__main__":
 
     # Maze animation
     parser.add_argument('-v', '--video', nargs='?', metavar='FPS', dest='video',  type=int, required=False, const=10,
-                        help='Export maze generation and solving as an mp4 video with the specified FPS (default: 10)')
+                        help="Export maze generation and solving as an mp4 video with the specified FPS (default: 10). '-o' REQUIRED")
 
     args = parser.parse_args()
 
@@ -523,7 +523,7 @@ if __name__ == "__main__":
         print_maze(width, height, v_walls, h_walls)
 
     # Generate animation
-    if args.video is not None:
+    if args.video is not None and args.output != "":
         img_name = "".join(args.output.split(".")[:-1])
         tmp_name = f"tmp.{img_name}.mp4"
         video_name = f"{img_name}.mp4"
