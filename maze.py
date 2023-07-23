@@ -441,9 +441,9 @@ if __name__ == "__main__":
                         help="Print the generated maze (walls only)")
 
     # Maze drawing
-    parser.add_argument('-o', '--output', metavar='OUTPUT_IMAGE', dest='output', type=str, required=False, default="",
+    parser.add_argument('-o', '--output', metavar='PATH', dest='output', type=str, required=False, default="",
                         help="Export maze as an image to specified path\nSolved maze is exported to "
-                             "'solution.OUTPUT_IMAGE'")
+                             "'PATH.IMAGE_NAME.solution.FORMAT'")
 
     parser.add_argument('-c', '--cellsize', metavar='CELL_SIZE', dest='size', type=int, required=False, default=64,
                         help='Cell size in pixels (default: 32)')
@@ -509,8 +509,9 @@ if __name__ == "__main__":
                                         weights=weights if args.gradient else None)
 
         # Save images to disk
-        maze.save(args.output)
-        solved_maze.save("solution." + args.output)
+        base_path = "".join(args.output.split(".")[:-1])
+        maze.save(base_path+".solution."+args.output.split(".")[-1])
+        solved_maze.save(args.output)
 
         end_rendering_time = time.process_time()
 
@@ -524,9 +525,9 @@ if __name__ == "__main__":
 
     # Generate animation
     if args.video is not None and args.output != "":
-        img_name = "".join(args.output.split(".")[:-1])
-        tmp_name = f"tmp.{img_name}.mp4"
-        video_name = f"{img_name}.mp4"
+        base_path = "".join(args.output.split(".")[:-1])
+        tmp_name = f"{base_path}.tmp.mp4"
+        video_name = f"{base_path}.mp4"
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         video = cv2.VideoWriter(tmp_name, fourcc , args.video, (width * args.size, height * args.size))
         animate_generation(video, width, height, args.size, recorded_gen_actions,
