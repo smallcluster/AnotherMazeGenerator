@@ -472,10 +472,6 @@ if __name__ == "__main__":
     build_maze(width, height, v_walls, h_walls, record_action=recorded_gen_actions)
     end_build_time = time.process_time()
 
-    # Timeit generation
-    if args.timeit:
-        print(f"Generation took: {end_build_time - start_build_time} s")
-
     # Start solution
     start_solve_time = time.process_time()
     start = random_start(width, height)
@@ -486,10 +482,6 @@ if __name__ == "__main__":
     # Generate the shortest path
     path = backtrace_solution(width, height, v_walls, h_walls, start, end, weights)
     end_solve_time = time.process_time()
-
-    # Timeit solving
-    if args.timeit:
-        print(f"Solving took: {end_solve_time - start_solve_time} s")
 
     # Wall and path display width for image export
     line_width = 2 * (args.size // 32)
@@ -517,10 +509,6 @@ if __name__ == "__main__":
 
         end_rendering_time = time.process_time()
 
-        # Timeit render
-        if args.timeit:
-            print(f"Rendering took: {end_rendering_time - start_rendering_time} s")
-
     # Print the maze
     if args.print:
         print_maze(width, height, v_walls, h_walls)
@@ -533,6 +521,9 @@ if __name__ == "__main__":
         video_name = f"{base_path}.mp4"
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         video = cv2.VideoWriter(tmp_name, fourcc , args.video, (width * args.size, height * args.size))
+
+        start_animation_time = time.process_time()
+
         animate_generation(video, width, height, args.size, recorded_gen_actions,
                                    line_width=line_width)
         animate_weights(video, width, height, v_walls, h_walls, weights,
@@ -554,4 +545,16 @@ if __name__ == "__main__":
 
         # clear tmp video file
         os.remove(tmp_name)
+
+        end_animation_time = time.process_time()
+    
+    # Timeit render
+        if args.timeit:
+            print(f"Generation took: {end_build_time - start_build_time} s")
+            print(f"Solving took: {end_solve_time - start_solve_time} s")
+            if args.output != "":
+                print(f"Images took: {end_rendering_time - start_rendering_time} s")
+            if args.video is not None and args.output != "":
+                print(f"Video took: {end_animation_time - start_animation_time} s")
+
 
