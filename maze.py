@@ -76,8 +76,8 @@ def get_neighbors(width, height, v_walls, h_walls, index):
     return n
 
 
-def solve_dijkstra(width, height, v_walls, h_walls, start, end=None, record_action=None):
-    weights = np.full(width * height, width * height - 1)
+def solve_dijkstra(width, height, v_walls, h_walls, start, end=None, record_action=None, webs=None, web_penality=4):
+    weights = np.full(width * height,  -1)
     weights[start] = 0
     queue = [start]
     while len(queue) > 0:
@@ -91,15 +91,20 @@ def solve_dijkstra(width, height, v_walls, h_walls, start, end=None, record_acti
         # Stop search if found or compute all weights
         if end is not None and index == end:
             break
+
         queue.remove(index)
         n = get_neighbors(width, height, v_walls, h_walls, index)
-        n_choices = [i for i in n if weights[index] < weights[i]]
-        for c in n_choices:
+
+        n_choices = []
+        for c in n:
+            penality = web_penality if webs is not None and webs[c] else 1
             # update neighbors
-            weights[c] = weights[index] + 1  # path weight is 1
-            # push to queue
-            if c not in queue:
-                queue.append(c)
+            if weights[index] + penality < weights[c] or weights[c] == -1:
+                weights[c] = weights[index] + penality
+                n_choices.append(c)
+                # push to queue
+                if c not in queue:
+                    queue.append(c)
 
         if record_action is not None and len(n_choices) > 0:
             record_action.append("update" + "".join([f" {i}" for i in n_choices]))
@@ -129,6 +134,11 @@ def generate_end_percent(start, weights, percent):
 
 def random_start(width, height):
     return random.randint(0, width * height - 1)
+
+def generate_webs(width, height, start, ratio):
+    webs = np.array(random.choices([True, False], weights=(ratio, 1-ratio), k=width*height))
+    webs[start] = False
+    return webs
 
 
 ########################################################################################################################
@@ -243,6 +253,14 @@ def draw_mouse(width, start, img, size):
     mouse.thumbnail((size - 2, size - 2), Image.LANCZOS)
     img.paste(mouse, mouse_pos, mouse)
 
+def draw_webs(width, webs, img, size):
+    web = Image.open("res/web.png")
+    web.thumbnail((size - 2, size - 2), Image.LANCZOS)
+    for i in range(len(webs)):
+        if webs[i]:
+            web_pos = ((i % width) * size, (i // width) * size)
+            img.paste(web, web_pos, web)
+
 
 def draw_cheese(width, end, img, size):
     # add cheese
@@ -289,22 +307,27 @@ def heat_rgb(minimum, maximum, value):
     return r, g, b
 
 
-def draw_heatmap(width, weights, imgd, size, weight_overrides=None):
+def draw_heatmap(width, weights, imgd, size, weight_overrides=None, show_text=False, line_width=1):
     m = np.max(weights)
     for i in range(len(weights)):
         if (weight_overrides is not None and weight_overrides[i]) or (weight_overrides is None):
             x, y = i % width, i // width
             color = heat_rgb(0, m, weights[i])
             imgd.rectangle([x * size, y * size, x * size + size, y * size + size], fill=color, outline=None)
+            if show_text:
+                imgd.text((x * size+line_width, y * size+line_width), str(weights[i]), align="left")
 
 
 def draw_maze(width, height, v_walls, h_walls, start, end, img, imgd, size, line_width=1, path=None, weights=None,
-              weight_overrides=None):
+              weight_overrides=None, webs=None, show_text=False):
     # Draw heatmap
     if weights is not None:
-        draw_heatmap(width, weights, imgd, size, weight_overrides)
+        draw_heatmap(width, weights, imgd, size, weight_overrides, show_text, line_width=line_width)
     # Draw walls
     draw_walls(width, height, v_walls, h_walls, imgd, size, line_width)
+    # Draw webs
+    if webs is not None:
+        draw_webs(width, webs, img, size)
     # Draw solution
     if path is not None:
         draw_solution(width, path, imgd, size, line_width, color=(255, 0, 255))
@@ -314,11 +337,11 @@ def draw_maze(width, height, v_walls, h_walls, start, end, img, imgd, size, line
 
 
 def create_maze_image(width, height, v_walls, h_walls, start, end, size, bg_color=(0, 0, 0), line_width=1, path=None,
-                      weights=None, weight_overrides=None):
+                      weights=None, weight_overrides=None, webs=None, show_text=False):
     img = Image.new(mode="RGB", size=(size * width, size * height), color=bg_color)
     img1 = ImageDraw.Draw(img)
-    draw_maze(width, height, v_walls, h_walls, start, end, img, img1, size, line_width, path=path,
-              weights=weights, weight_overrides=weight_overrides)
+    draw_maze(width, height, v_walls, h_walls, start, end, img, img1, size, line_width=line_width, path=path,
+              weights=weights, weight_overrides=weight_overrides, webs=webs, show_text=show_text)
     return img
 
 
@@ -364,7 +387,7 @@ def animate_generation(video, width, height, size, recorded_actions, bg_color=(0
 
 # weights
 def animate_weights(video, width, height, v_walls, h_walls, weights, recorded_actions,
-                    size, bg_color=(0, 0, 0), line_width=1):
+                    size, bg_color=(0, 0, 0), line_width=1, webs=None, show_text=False):
     weight_overrides = np.full(width * height, False)
     for a in recorded_actions:
         command = a.split(" ")
@@ -376,11 +399,17 @@ def animate_weights(video, width, height, v_walls, h_walls, weights, recorded_ac
             index = int(command[1])
             weight_overrides[index] = True
             # Draw Maze
-            draw_heatmap(width, weights, img1, size, weight_overrides=weight_overrides)
+            # heat map
+            draw_heatmap(width, weights, img1, size, weight_overrides=weight_overrides, show_text=show_text, line_width=line_width)
             # Selection
             x, y = index % width, index // width
             img1.rectangle((x * size, y * size, x * size + size, y * size + size), fill=(255, 0, 255), outline=None)
+            # Walls
             draw_walls(width, height, v_walls, h_walls, img1, size, line_width=line_width)
+            # Webs
+            if webs is not None:
+                draw_webs(width, webs, img, size)
+            # mouse
             draw_mouse(width, start, img, size)
             video.write(cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR))
         elif command[0] == "update":
@@ -390,16 +419,20 @@ def animate_weights(video, width, height, v_walls, h_walls, weights, recorded_ac
 
 
 def animate_solve(video, width, height, v_walls, h_walls, weights, path, size,
-                  bg_color=(0, 0, 0), line_width=1):
+                  bg_color=(0, 0, 0), line_width=1, webs=None, show_text=False):
     for i in range(1, len(path)):
 
         img = Image.new(mode="RGB", size=(size * width, size * height), color=bg_color)
         img1 = ImageDraw.Draw(img)
 
         # draw heatmap
-        draw_heatmap(width, weights, img1, size)
+        draw_heatmap(width, weights, img1, size, show_text=show_text, line_width=line_width)
         # draw walls
         draw_walls(width, height, v_walls, h_walls, img1, size, line_width=line_width)
+
+        # Webs
+        if webs is not None:
+            draw_webs(width, webs, img, size)
 
         # draw lines
         for j in range(i):
@@ -427,6 +460,7 @@ if __name__ == "__main__":
     # Maze generation
     parser.add_argument('-x', '--width', metavar='NB_COLUMNS', dest='w', type=int, required=False, default=10,
                         help='Maze width (default: 10)')
+    
     parser.add_argument('-y', '--height', metavar='NB_LINES', dest='h', type=int, required=False, default=10,
                         help='Maze height (default: 10)')
 
@@ -435,11 +469,12 @@ if __name__ == "__main__":
 
     parser.add_argument('-t', '--timeit', dest='timeit', required=False, default=False, action='store_true',
                         help="Time maze generation, solving and rendering")
-
+    
+    parser.add_argument('-w', '--webs', metavar='PENALITY;RATIO', nargs='?', dest='webs', type=str, required=False, default="4;0.0",
+                        help="Generate RATIO percentage of cells as traps to slow down the mouse with a PENALITY (default: \"4;0.0\")")
     # Maze printing
     parser.add_argument('-p', '--print', dest='print', required=False, default=False, action='store_true',
                         help="Print the generated maze (walls only)")
-
     # Maze drawing
     parser.add_argument('-o', '--output', metavar='PATH', dest='output', type=str, required=False, default="",
                         help="Export maze as an image to specified path\nSolved maze is exported to "
@@ -447,9 +482,13 @@ if __name__ == "__main__":
 
     parser.add_argument('-c', '--cellsize', metavar='CELL_SIZE', dest='size', type=int, required=False, default=64,
                         help='Cell size in pixels (default: 32)')
+    
+    parser.add_argument('-b', '--breakwalls', metavar='RATIO', dest='breakratio', type=float, required=False, default=0.0,
+                        help="Break RATIO percentage of walls (default: 0.0)")
+    
 
-    parser.add_argument('-g', '--gradient', dest='gradient', required=False, default=False, action='store_true',
-                        help='Draw path length heatmap')
+    parser.add_argument('-g', '--gradient', metavar='SHOW_TEXT', nargs='?', dest='gradient', type=bool, required=False, const=False,
+                        help="Draw path length heatmap with optional text (on if any arg is present)")
 
     # Maze animation
     parser.add_argument('-v', '--video', nargs='?', metavar='FPS', dest='video',  type=int, required=False, const=10,
@@ -457,10 +496,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+
     # random seed
     if args.seed is not None:
         random.seed(args.seed)
         np.random.seed(args.seed)
+
+    web_penality  = int(args.webs.split(";")[0])
+    webs_ratio  = float(args.webs.split(";")[1])
 
     # Maze size
     width, height = args.w, args.h
@@ -470,15 +513,30 @@ if __name__ == "__main__":
     recorded_gen_actions = [] if args.video is not None else None
     v_walls, h_walls = init_maze(width, height)
     build_maze(width, height, v_walls, h_walls, record_action=recorded_gen_actions)
+
+
+    # breaks some walls
+    for i in v_walls.nonzero()[0]:
+        if random.random() < args.breakratio: # random break
+            v_walls[i] = False
+    for i in h_walls.nonzero()[0]:
+        if random.random() < args.breakratio: # random break
+            h_walls[i] = False
+
     end_build_time = time.process_time()
 
     # Start solution
     start_solve_time = time.process_time()
     start = random_start(width, height)
+    webs=generate_webs(width, height, start, webs_ratio)
     # Weights are needed to generate random end
     recorded_weights_actions = [] if args.video is not None else None
-    weights = solve_dijkstra(width, height, v_walls, h_walls, start, record_action=recorded_weights_actions)
+    weights = solve_dijkstra(width, height, v_walls, h_walls, start, record_action=recorded_weights_actions, webs=None, web_penality=web_penality)
     end = generate_end_percent(start, weights, 0.75)  # 0.75 is a nice spot
+    # Regenerate weights (trick to keep the seed stable)
+    if webs_ratio > 0:
+        recorded_weights_actions = []
+        weights = solve_dijkstra(width, height, v_walls, h_walls, start, record_action=recorded_weights_actions, webs=webs, web_penality=web_penality)
     # Generate the shortest path
     path = backtrace_solution(width, height, v_walls, h_walls, start, end, weights)
     end_solve_time = time.process_time()
@@ -494,11 +552,11 @@ if __name__ == "__main__":
         # Create images
         maze = create_maze_image(width, height, v_walls, h_walls, start, end, args.size, line_width=line_width,
                                  path=None,
-                                 weights=weights if args.gradient else None)
+                                 weights=weights if args.gradient is not None else None, webs=webs, show_text= args.gradient if args.gradient is not None else False)
 
         solved_maze = create_maze_image(width, height, v_walls, h_walls, start, end, args.size, line_width=line_width,
                                         path=path,
-                                        weights=weights if args.gradient else None)
+                                        weights=weights if args.gradient is not None else None, webs=webs, show_text= args.gradient if args.gradient is not None else False)
 
         # Save images to disk
         img_format = args.output.split(".")[-1]
@@ -527,11 +585,11 @@ if __name__ == "__main__":
         animate_generation(video, width, height, args.size, recorded_gen_actions,
                                    line_width=line_width)
         animate_weights(video, width, height, v_walls, h_walls, weights,
-                                recorded_weights_actions, args.size, line_width=line_width)
+                                recorded_weights_actions, args.size, line_width=line_width, webs=webs)
         animate_solve(video, width, height, v_walls, h_walls, weights, path, args.size,
-                              line_width=line_width)
+                              line_width=line_width, webs=webs)
         solved_maze = create_maze_image(width, height, v_walls, h_walls, start, end, args.size, line_width=line_width,
-                                        path=path)
+                                        path=path, webs=webs)
         video.write(cv2.cvtColor(np.array(solved_maze), cv2.COLOR_RGB2BGR))
         video.release()
 
