@@ -509,7 +509,8 @@ if __name__ == "__main__":
                                         weights=weights if args.gradient else None)
 
         # Save images to disk
-        base_path = "".join(args.output.split(".")[:-1])
+        img_format = args.output.split(".")[-1]
+        base_path = args.output[:-len(img_format)]
         maze.save(base_path+".solution."+args.output.split(".")[-1])
         solved_maze.save(args.output)
 
@@ -525,7 +526,8 @@ if __name__ == "__main__":
 
     # Generate animation
     if args.video is not None and args.output != "":
-        base_path = "".join(args.output.split(".")[:-1])
+        img_format = args.output.split(".")[-1]
+        base_path = args.output[:-len(img_format)]
         tmp_name = f"{base_path}.tmp.mp4"
         video_name = f"{base_path}.mp4"
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
