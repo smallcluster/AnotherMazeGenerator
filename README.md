@@ -1,12 +1,16 @@
-<img src="https://github.com/smallcluster/AnotherMazeGenerator/blob/images/home.png?raw=true" width="250px" align="right">
-
 # AnotherMazeGenerator
+
+<img src="https://github.com/smallcluster/AnotherMazeGenerator/blob/images/home.png?raw=true" width="250px" align="left">
 
 Yet again, another CLI maze generator written in python, but with a cool visualization to video!
 
 Help Mr.Squeaks 🐁 to get that 🧀! But beware of the sticky spider webs 🕷️🕸️, they will slow you down!
 
-<br><br><br><br>
+## Why ?
+
+Python being the **FASTEST** 🚀 language known to man, you can take the coffee break **YOU** 🫵 deserve and get your self a nice maze with its generation and solving steps in a video when you come back 🥳
+
+<br>
 
 ---
 
@@ -43,6 +47,3 @@ python maze.py -o example.png -v
 
 <img src="https://github.com/smallcluster/AnotherMazeGenerator/blob/images/example.gif?raw=true" width="400"/>
 
-## Why ?
-
-Python being the **FASTEST** 🚀 language known to man, you can take the coffee break **YOU** 🫵 deserve and get your self a nice maze when you come back 🥳
