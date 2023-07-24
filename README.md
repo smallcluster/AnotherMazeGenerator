@@ -10,8 +10,6 @@ Help Mr.Squeaks 🐁 to get that 🧀! But beware of the sticky spider webs 🕷
 
 Python being the **FASTEST** 🚀 language known to man, you can take the coffee break **YOU** 🫵 deserve and get your self a nice maze with its generation and solving steps in a video when you come back 🥳
 
-<br>
-
 ---
 
 ## Requirements
