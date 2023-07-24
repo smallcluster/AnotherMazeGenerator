@@ -70,7 +70,7 @@ python maze.py -o example.png -g
 </p>
 
 
-#### 🕸️ Add webs 
+#### 🕸️ Add webs and allow multiple possible solutions
 
 TODO: document this
 
