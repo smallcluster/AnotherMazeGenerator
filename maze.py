@@ -6,7 +6,6 @@ import random
 import math
 import time
 import cv2
-import ffmpeg
 
 
 ########################################################################################################################
@@ -575,10 +574,10 @@ if __name__ == "__main__":
     if args.video is not None and args.output != "":
         img_format = args.output.split(".")[-1]
         base_path = args.output[:-len(img_format)-1]
-        tmp_name = f"{base_path}.tmp.mp4"
         video_name = f"{base_path}.mp4"
+
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        video = cv2.VideoWriter(tmp_name, fourcc , args.video, (width * args.size, height * args.size))
+        video = cv2.VideoWriter(video_name, fourcc , args.video, (width * args.size, height * args.size))
 
         start_animation_time = time.process_time()
 
@@ -592,18 +591,6 @@ if __name__ == "__main__":
                                         path=path, webs=webs)
         video.write(cv2.cvtColor(np.array(solved_maze), cv2.COLOR_RGB2BGR))
         video.release()
-
-        # compress video
-        if os.path.exists(video_name):
-            os.remove(video_name)
-
-        stream = ffmpeg.input(tmp_name)
-        stream = ffmpeg.output(stream, video_name, loglevel="quiet")
-        ffmpeg.run(stream)
-
-        # clear tmp video file
-        os.remove(tmp_name)
-
         end_animation_time = time.process_time()
     
     # Timeit render
