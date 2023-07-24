@@ -2,13 +2,13 @@
 
 <img src="https://github.com/smallcluster/AnotherMazeGenerator/blob/images/home.png?raw=true" width="250px" align="left">
 
-Yet again, another CLI maze generator written in **Python3** <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="18px"/>, but with a cool visualization to video!
+Yet again, another CLI maze generator written in **Python3**, but with a cool visualization to video!
 
 Help Mr.Squeaks 🐁 to get that 🧀! But beware of the sticky spider webs 🕷️🕸️, they will slow you down!
 
 ## Why ?
 
-Python being the **FASTEST** 🚀 language known to man, you can take the coffee break **YOU** 🫵 deserve and get your self a nice maze with its generation and solving steps in a video when you come back 🥳
+Python being the **FASTEST** 🚀 language known to man, you can take the coffee break **YOU** 🫵 deserve and get your self a nice maze with its generation and solving steps in a video when you come back.
 
 ---
 
