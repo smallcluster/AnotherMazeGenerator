@@ -76,7 +76,7 @@ def get_neighbors(width, height, v_walls, h_walls, index):
 
 
 def solve_dijkstra(width, height, v_walls, h_walls, start, end=None, record_action=None, webs=None, web_penality=4):
-    weights = np.full(width * height,  width * height+1)
+    weights = np.full(width * height,  math.inf)
     weights[start] = 0
     queue = [start]
     while len(queue) > 0:
