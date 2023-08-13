@@ -76,7 +76,7 @@ def get_neighbors(width, height, v_walls, h_walls, index):
 
 
 def solve_dijkstra(width, height, v_walls, h_walls, start, end=None, record_action=None, webs=None, web_penality=4):
-    weights = np.full(width * height,  -1)
+    weights = np.full(width * height,  width * height+1)
     weights[start] = 0
     queue = [start]
     while len(queue) > 0:
@@ -98,7 +98,7 @@ def solve_dijkstra(width, height, v_walls, h_walls, start, end=None, record_acti
         for c in n:
             penality = web_penality if webs is not None and webs[c] else 1
             # update neighbors
-            if weights[index] + penality < weights[c] or weights[c] == -1:
+            if weights[index] + penality < weights[c]:
                 weights[c] = weights[index] + penality
                 n_choices.append(c)
                 # push to queue
