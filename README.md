@@ -72,7 +72,13 @@ python maze.py -o example.png -g
 
 #### 🕸️ Add webs and allow multiple possible solutions
 
-TODO: document this
+One can add webs that slow down Mr.Squeaks by setting a penalty weight and a random spawn chance with the `-w` argument. `-w` waits for a string with a `int` and a `float` separated by a `;` :
+
+`-w "penality(int);spawn_chance([0,1])"`
+
+But by default, the generated maze is a *perfect maze*, which means there is only **one** path covering the whole maze. This makes webs unavoidable !
+
+To prevent this, one can randomly break some walls by supplying a probability (float between 0 and 1) to the `-b` option.
 
 **Example:**
 
@@ -82,7 +88,9 @@ python maze.py -o example.png -w "4;0.1" -b 0.2
 
 <p align="center">
     <img src="https://github.com/smallcluster/AnotherMazeGenerator/blob/images/webs.png?raw=true" width="200px"> <img src="https://github.com/smallcluster/AnotherMazeGenerator/blob/images/webs.solution.png?raw=true" width="200px"> <br>
-    example.png (left), example.solution.png (right)
+    example.png (left), example.solution.png (right)<br>
+    -<br>
+    The solution purposely walks around the first spider web
 </p>
 
 ### 🎬 Visualize the algorithms
