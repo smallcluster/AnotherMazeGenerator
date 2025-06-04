@@ -9,9 +9,7 @@ Help Mr.Squeaks 🐁 to get that 🧀! But beware of the sticky spider webs 🕷
 ## Why ?
 
 Mazes
-
 are
-
 cool!
 
 ---
