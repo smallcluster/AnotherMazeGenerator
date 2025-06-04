@@ -26,7 +26,7 @@ pip install -r requirements.txt
 - pillow
 - opencv-python
 
-## > Basic usage
+## Basic usage
 
 ### Help
 
