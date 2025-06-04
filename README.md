@@ -8,11 +8,11 @@ Help Mr.Squeaks 🐁 to get that 🧀! But beware of the sticky spider webs 🕷
 
 ## Why ?
 
-Python being the **FASTEST** 🚀 language known to man, you can take the coffee break **YOU** 🫵 deserve and get your self a nice maze with its generation and solving steps in a video when you come back.
+Mazes are cool.
 
 ---
 
-## 📦 Requirements
+## Requirements
 
 Install the required libraries:
 
@@ -26,7 +26,7 @@ pip install -r requirements.txt
 
 ## > Basic usage
 
-### 📖 Help
+### Help
 
 To show all CLI options use the `-h` option:
 
@@ -34,7 +34,7 @@ To show all CLI options use the `-h` option:
 python maze.py -h
 ```
 
-### 🖼️ Create a maze
+### Create a maze
 
 Just specify image name (with its format) to the `-o` argument. Two images of a maze will be generated:
 
@@ -52,7 +52,7 @@ python maze.py -o example.png
     example.png (left), example.solution.png (right)
 </p>
 
-#### 🏋️ Show weights
+#### Show weights
 
 Maze solving uses the *dijkstra* algorithm to compute all cells weights (min path length from source). 
 
@@ -70,7 +70,7 @@ python maze.py -o example.png -g
 </p>
 
 
-#### 🕸️ Add webs and allow multiple possible solutions
+#### Add webs and allow multiple possible solutions
 
 One can add webs that slow down Mr.Squeaks by setting a penalty weight and a random spawn chance with the `-w` argument. `-w` waits for a string with a `int` and a `float` separated by a `;` :
 
@@ -93,7 +93,7 @@ python maze.py -o example.png -w "4;0.1" -b 0.2
     The solution purposely walks around the first spider web
 </p>
 
-### 🎬 Visualize the algorithms
+### Visualize the algorithms
 
 If an image is specified, one can use the `-v` option to generate a mp4 video showing the maze generation and maze solving.
 
